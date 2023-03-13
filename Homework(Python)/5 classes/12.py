@@ -145,8 +145,11 @@ second_lecturer.courses_attached += ['Pascal']
 second_lecturer.courses_attached += ['Java']
 
 first_student.rate_lecturer(first_lecturer, 'Python', 3)
+second_student.rate_lecturer(first_lecturer, 'Python', 3)
 first_student.rate_lecturer(second_lecturer, 'Python', 5)
 first_student.rate_lecturer(second_lecturer, 'Pascal', 4)
+second_student.rate_lecturer(first_lecturer, 'C+', 8)
+second_student.rate_lecturer(first_lecturer, 'C+', 8)
 second_student.rate_lecturer(first_lecturer, 'C+', 8)
 second_student.rate_lecturer(first_lecturer, 'Java', 7)
 third_student.rate_lecturer(first_lecturer, 'Java', 7)
@@ -154,35 +157,38 @@ third_student.rate_lecturer(second_lecturer, 'Pascal', 4)
 
 first_reviewer = Reviewer('First', ' Rewiever')
 second_reviewer = Reviewer('Second', ' Rewiever')
-# first_reviewer.rate_student(first_student, 'Python', 4)
-# first_reviewer.rate_student(first_student, 'Python', 10)
-# first_reviewer.rate_student(first_student, 'Pascal', 6)
-# first_reviewer.rate_student(second_student, 'C+', 6)
-# first_reviewer.rate_student(first_student, 'C+', 6)
+first_reviewer.rate_student(first_student, 'Python', 4)
+first_reviewer.rate_student(first_student, 'Python', 10)
+first_reviewer.rate_student(first_student, 'Pascal', 6)
+first_reviewer.rate_student(second_student, 'C+', 6)
+first_reviewer.rate_student(third_student, 'Java', 6)
+first_reviewer.rate_student(second_student, 'C+', 6)
+first_reviewer.rate_student(second_student, 'Java', 6)
+first_reviewer.rate_student(first_student, 'C+', 6)
 first_reviewer.rate_student(second_student, 'Java', 10)
 first_reviewer.rate_student(second_student, 'Python', 10)
 first_reviewer.rate_student(third_student, 'C+', 6)
 first_reviewer.rate_student(third_student, 'C+', 6)
 
-print('\nСтуденты:\n')
-print(first_student, '\n')
-print(second_student, '\n')
-print(third_student)
+# print('\nСтуденты:\n')
+# print(first_student, '\n')
+# print(second_student, '\n')
+# print(third_student)
 
-print('\nЛекторы:\n')
-print(first_lecturer, '\n')
-print(second_lecturer)
+# print('\nЛекторы:\n')
+# print(first_lecturer, '\n')
+# print(second_lecturer)
 
-print('\nРевьюверы:\n')
-print(first_reviewer, '\n')
-print(second_reviewer)
+# print('\nРевьюверы:\n')
+# print(first_reviewer, '\n')
+# print(second_reviewer)
 
 # print(first_student.avarange_score)
 # print(second_student.avarange_score)
-print('\n\n<-сравнение среднего балла->\n\n')
-print(first_student <= second_student)
-print(first_lecturer >= second_lecturer)
-print(first_student >= third_student)
+# print('\n\n<-сравнение среднего балла->\n\n')
+# print(first_student <= second_student)
+# print(first_lecturer >= second_lecturer)
+# print(first_student >= third_student)
 
 # print(first_student.grades)
 # print(second_student.grades)
@@ -198,15 +204,15 @@ def students_avarange_score(students_list, course):
     counter = 0
     for student in students_list:
         if course in student.grades:
-            counter += 1
+            counter += len(student.grades[course])
             course_participant.append(student.name)
             all_score += sum(student.grades[course])
     if counter == 0:
         return f'{course}: нет оценок курса'
     else:
         return (f'Средний балл среди студентов по курсу {course} равен: '
-                f'{all_score/counter: .1f}--> общий балл по курсу: {all_score}, '
-                f' \nвсего студентов, получивших оценки на курсе: {counter} ({", ".join(course_participant)})\n')
+                f'{all_score/counter: .1f}--> сумма баллов по курсу: {all_score}, '
+                f' \nвсего кол-во оценок на курсе: {counter}, участники курса: {", ".join(course_participant)}\n')
 
 
 lecturers_list = [first_lecturer, second_lecturer]
@@ -218,7 +224,7 @@ def lecturers_avarange_score(lecturers_list, course):
     counter = 0
     for lector in lecturers_list:
         if course in lector.grades:
-            counter += 1
+            counter += len(lector.grades[course])
             course_participant.append(lector.name)
             all_score += sum(lector.grades[course])
     if counter == 0:
@@ -226,7 +232,7 @@ def lecturers_avarange_score(lecturers_list, course):
     else:                        
         return (f'Средний балл среди лекторов по курсу {course} равен: '
                 f'{all_score/counter: .1f}--> общий балл по курсу: {all_score},'
-                f' \nвсего лекторов, получивших оценки на курсе: {counter} ({", ".join(course_participant)})\n')
+                f' \nвсего кол-во оценок на курсе: {counter}, участники курса: {", ".join(course_participant)}\n')
 
 
 print(students_avarange_score(students_list, 'C+'))
@@ -236,4 +242,4 @@ print(lecturers_avarange_score(lecturers_list, 'Python'))
 print(lecturers_avarange_score(lecturers_list, 'C+'))
 print(lecturers_avarange_score(lecturers_list, 'Pascal'))
 print(lecturers_avarange_score(lecturers_list, 'ЛЛ'))
-print(Reviewer.mro())
+# print(Reviewer.mro())
