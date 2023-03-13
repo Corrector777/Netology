@@ -68,7 +68,7 @@ first_student.rate_lecturer(first_lecturer, 'Python', 10)
 first_student.rate_lecturer(second_lecturer, 'Python', 10)
 second_student.rate_lecturer(first_lecturer, 'C+', 10)
 second_student.rate_lecturer(first_lecturer, 'Java', 10)
-second_student.rate_lecturer(second_lecturer, 'C+', 10)
+second_student.rate_lecturer(second_lecturer, 'C+', 9)
 
 first_reviewer = Reviewer('First', ' Rewiever')
 first_reviewer.courses_attached += ['Python']
