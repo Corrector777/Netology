@@ -2,18 +2,18 @@ import os
 
 
 def write_file(path: str):
-    path = '/Users/roman/Vs-Code/Netology(Python)/Homework/Open-write files/Запись/'
+    path = '/Users/roman/Vs-Code/Netology(Python)/Homework(Python)/Open-write files/Запись/'
     files_list = os.listdir(path)
     file_comparison = {}
     for file in files_list:
         if file.rfind('.txt', -4) >= 0:
             f_string = []
-            with open(os.path.join('/Users/roman/Vs-Code/Netology(Python)/Homework/Open-write files/Запись/' ,file), encoding='utf-8') as f:
+            with open(os.path.join('/Users/roman/Vs-Code/Netology(Python)/Homework(Python)/Open-write files/Запись/', file), encoding='utf-8') as f:
                 for string in f:
                     f_string.append(string)
             file_comparison[file] = f_string
 
-    with open('/Users/roman/Vs-Code/Netology(Python)/Homework/Open-write files/Запись/result/result.txt', 'w') as result:
+    with open('/Users/roman/Vs-Code/Netology(Python)/Homework(Python)/Open-write files/Запись/result/result.txt', 'w') as result:
         for file_name, row in sorted(file_comparison.items(), key=lambda x: len(x[1])):
             result.write('имя файла: ' + file_name + '\n')
             result.write('кол-во строк: ' + str(len(row)) + '\n')
@@ -24,8 +24,8 @@ def write_file(path: str):
     return file_comparison
 
 
-print(write_file('/Users/roman/Vs-Code/Netology(Python)/Homework/Open-write files/Запись'))
-print(write_file('Netology(Python)/Homework/Open-write files/Запись/'))
+print(write_file('/Users/roman/Vs-Code/Netology(Python)/Homework(Python)/Open-write files/Запись/'))
+# print(write_file('Netology(Python)/Homework/Open-write files/Запись/'))
 
 
 
