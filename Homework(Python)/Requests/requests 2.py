@@ -1,6 +1,9 @@
 import requests
 from pprint import pprint
 
+with open('/Users/roman/Git/Token') as file:
+    TOKEN = file.readline()
+
 
 class YaDisk:
 
@@ -31,13 +34,14 @@ class YaDisk:
         if res.status_code == 409:
             return f'ERROR!Folder {folder_name} already created'
         return res
-        
     
     def upload_file_link(self, yandex_path: str):
         headers = self.get_header()
         get_url = f'{self.ya_url}/v1/disk/resources/upload'
         params = {'path': yandex_path}
         response = requests.get(url=get_url, headers=headers, params=params)
+        if response.status_code == 200:
+            print('Запрос ссылки успешен')
         response.raise_for_status()
         return response.json()
 
@@ -45,16 +49,18 @@ class YaDisk:
         download_response = self.upload_file_link(yandex_path=yandex_path)
         href_url = download_response.get('href', '')
         with open(my_file_path, 'rb') as f:
-            get_response = requests.put(url=href_url, datafiles=f)
+            get_response = requests.put(url=href_url, data=f)
+        if get_response.status_code == 201:
+            print('Файл успешно записан')
         get_response.raise_for_status()
         return get_response
 
 
 if __name__ == '__main__':
     # Получить путь к загружаемому файлу и токен от пользователя
-    my_file_path = '/Users/roman/Git/Netology/Homework(Python)/5 classes/10.py'
-    file_name_for_yandex_disk = '6.py'
-    token = 
+    my_file_path = '/Users/roman/Git/Netology/Homework(Python)/5 classes/11.py'
+    file_name_for_yandex_disk = '40.py'
+    token = TOKEN
     ya_disk = YaDisk(token)
     # ya_disk.folder_creator('Practice')
     ya_disk.upload_file(f'Practice/{file_name_for_yandex_disk}', my_file_path)
