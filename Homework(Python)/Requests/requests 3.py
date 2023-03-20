@@ -18,14 +18,14 @@ def request_overflow(page):  # Определяем функцию, котора
                'Connection': 'keep-alive'}
 
     params = {
-        'key': 'U4DMV*8nvpm3EOpvf69Rxw((',
+        # 'key': 'U4DMV*8nvpm3EOpvf69Rxw((',
         'site': 'stackoverflow',
-        'fromdate': '1678924800',
-        'todate': '1679097600',
+        'fromdate': actual_date(),
         'order': 'desc',
         'sort': 'creation',
         'tagged': 'python',
         'page': page,
+        "pagesize": 100,
         }
     url = 'https://api.stackexchange.com/2.3/questions'
 
