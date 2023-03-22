@@ -59,8 +59,8 @@ class YaDisk:
 if __name__ == '__main__':
     # Получить путь к загружаемому файлу и токен от пользователя
     my_file_path = '/Users/roman/Git/Netology/Homework(Python)/5 classes/11.py'
-    file_name_for_yandex_disk = '11.py'
+    file_name_for_yandex_disk = '12.py'
     token = TOKEN
     ya_disk = YaDisk(token)
     # ya_disk.folder_creator('Practice')
-    ya_disk.upload_file(file_name_for_yandex_disk, my_file_path)
+    ya_disk.upload_file(yandex_path=file_name_for_yandex_disk, my_file_path=my_file_path)
