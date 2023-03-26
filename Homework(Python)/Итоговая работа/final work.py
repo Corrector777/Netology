@@ -1,13 +1,12 @@
 import requests
 from pprint import pprint
+from tqdm import tqdm
+from datetime import datetime
+import json
 
-with open('/Users/roman/Git/Token') as file:
-    TOKEN = file.readline()
-
-
-with open('Homework(Python)/Итоговая работа/vktoken.ini') as vktoken:
-    VKTOKEN = vktoken.readline()
-photo_links_dict = {}
+with open('/Users/roman/Git/Token.ini') as file:
+    YA_TOKEN = file.readline().strip()
+    VKTOKEN = file.readline().strip()
 
 
 class YaDisk:
@@ -60,15 +59,33 @@ class YaDisk:
         get_response.raise_for_status()
         return get_response
     
-    def upload_file_by_url(self, yandex_path: str, file_url: str):
-        download_response = self.upload_file_link(yandex_path=yandex_path)
-        href_url = download_response.get('href', '')
-        get_response = requests.post(url=href_url, data=file_url)
-        if get_response.status_code == 201:
-            print('Файл успешно записан')
-        get_response.raise_for_status()
-        return get_response
+    def upload_file_by_url(self, yandex_dir, photo_files):
+        json_output = []
+        upload_url = f'{self.ya_url}/v1/disk/resources/upload'
+        for file in tqdm(photo_files, desc="Loading: ", ncols=100, colour='blue'):
+            yandex_path = f'{yandex_dir}/{file["name"]}.jpeg'
+            file_url = f'{file["url"]}'
+            params_for_upload = {
+                                'url': file_url,
+                                'path': yandex_path,
+                                }
+            res = requests.post(upload_url, params=params_for_upload, headers=self.get_header())
+            # res.raise_for_status()
 
+            json_info = {
+                        'name': file['name'],
+                        'size': file['type'],
+                        'folder': yandex_dir,
+                        }
+            json_output.append(json_info)
+        with open('/Users/roman/Git/Netology/Homework(Python)/Итоговая работа/output.json', 'a') as info:
+            json.dump(json_output, info)
+
+        if 300 >= res.status_code >= 201:
+            print(f'all files downloaded successfully')
+        else:
+            print('Error')
+        
 
 class VK:
 
@@ -87,38 +104,57 @@ class VK:
         response = requests.get(url, params={**self.params, **params})
         return response.json()
     
-    def users_avatar(self):
+    def users_photo(self):
+        user_photo = input("""
+        введите , какой альбом вас интересует:
+        •wall — фотографии со стены,
+        •profile — фотографии профиля,
+        •saved — сохраненные фотографии.
+        """)
+        count = input('Введите кол-во выводимых фотографий')
         url = self.url + '/photos.get'
         params = {'owner_id': self.id,
-                  'album_id': 'profile',
-                  'extended': 1,
-                  'photo_sizes': 1
+                  'album_id': user_photo,
+                  'extended': 'likes',
+                  'photo_sizes': 1,
+                  'count': count
                   }
-        response = requests.get(url, params={**self.params, **params})
-        return response.json()
+        response = requests.get(url, params={**self.params, **params}).json()
+        return response['response']['items']
+        
+    def get_max_size_photo(self, photo_sizes):
 
-    def max_size_foto(self):
-        response = self.users_avatar()
-        result = response['response']['items']
-        for item in result:
-            key = item['likes']['count']
-            for type in item['sizes']:
-                if 'w' in type['type']:
-                    photo_links_dict[key] = type['url']
-
+        # pprint(photo_sizes)
+        max_size_photo = []
+        for photo in photo_sizes:
+            # pprint(photo)
+            photo_dict = {}
+            photo_name = str(photo['likes']['count'])
+            for user_photo in max_size_photo:
+                if user_photo['name'] == photo_name:
+                    photo_name += f"({datetime.utcfromtimestamp(int(photo['date'])).strftime('%Y-%m-%d: %H-%M')})"
+            sizes = {'w': 10, 'z': 9, 'y': 8, 'x': 7, 'm': 6, 's': 5}
+            sorted_photo_sizes = sorted(photo['sizes'], key=lambda x: sizes.get(x['type'], 0))
+            max_sized_photo = sorted_photo_sizes[-1]
+            photo_dict.setdefault('name', photo_name)
+            photo_dict.setdefault('url', max_sized_photo['url'])
+            photo_dict.setdefault('type', max_sized_photo['type'])
+            max_size_photo.append(photo_dict)
+        return max_size_photo
 
 
 if __name__ == '__main__':
-    # vk_token = VKTOKEN
-    # user_id = '3562537'
-    # vk = VK(vk_token, user_id)
-    # vk.max_size_foto()
-    # print(photo_links_dict)
+    def save_photo_to_ya_disk():
+        vk_token = VKTOKEN
+        ya_token = YA_TOKEN
+        user_id = '1288829'
+        vk = VK(vk_token, user_id)
+        photo_sizes = vk.users_photo()
+        photo_files = vk.get_max_size_photo(photo_sizes=photo_sizes)
+        ya_disk = YaDisk(token=ya_token)
+        directory_name = input('Введите название папки для сохранения файлов: ')
+    
+        ya_disk.folder_creator(directory_name)
+        ya_disk.upload_file_by_url(yandex_dir=directory_name, photo_files=photo_files)
 
-    # my_file_path = '/Users/roman/Git/Netology/Homework(Python)/5 classes/11.py'
-    file_name_for_yandex_disk = '11.jpeg'
-    token = TOKEN
-    ya_disk = YaDisk(token)
-    my_file_url = 'https://sun9-38.userapi.com/impg/E8s25Ph5NUYdbNFgx2LcJcjFiGjOgpyqsetoDQ/bX8SxkMi-3M.jpg?size=1344x1792&quality=95&sign=409f5c32e88176ff1299e06a6fc2ebde&c_uniq_tag=cFbvYRcWG0OspRXdQ-nJi8vUZiI6py1jr1hkXKEgzEA&type=album'
-#     # ya_disk.folder_creator('Practice')
-    ya_disk.upload_file_by_url(yandex_path=file_name_for_yandex_disk, file_url=my_file_url)
+    save_photo_to_ya_disk()
