@@ -81,7 +81,7 @@ class YaDisk:
         with open('/Users/roman/Git/Netology/Homework(Python)/Итоговая работа/output.json', 'a') as info:
             json.dump(json_output, info)
 
-        if 300 >= res.status_code >= 201:
+        if 390 >= res.status_code >= 200:
             print(f'all files downloaded successfully')
         else:
             print('Error')
