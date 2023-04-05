@@ -149,8 +149,6 @@ if __name__ == '__main__':
     main()
 
 
-
-
     #    def get_max_size_photo(self, photo_sizes: list) -> dict | None:
     #     sizes = ['w', 'z', 'y', 'x', 'm', 's']
     #     new_dict = {size['type']: size for size in photo_sizes}
