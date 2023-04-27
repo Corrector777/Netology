@@ -41,8 +41,8 @@ collection_year TEXT NOT NULL
 
 CREATE TABLE IF NOT EXISTS CollectionsTracks (
 	id_collection INTEGER REFERENCES Collections(id),
-	id_tracks INTEGER REFERENCES Tracks(id),
-CONSTRAINT tk PRIMARY KEY (id_collection, id_tracks) 
+	id_track INTEGER REFERENCES Tracks(id),
+CONSTRAINT tk PRIMARY KEY (id_collection, id_track) 
 );
 
 -- Заполните базу данных из предыдущего домашнего задания. В ней должно быть:
