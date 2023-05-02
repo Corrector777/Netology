@@ -212,5 +212,7 @@ where name NOT LIKE '% %';
 SELECT name FROM tracks
 where name LIKE '%my%';
 
+SELECT name, duration FROM tracks
+WHERE  collection_year = (SELECT collection_year >=2019  FROM collections);
 
   
