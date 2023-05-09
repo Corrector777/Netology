@@ -1,49 +1,3 @@
-CREATE TABLE IF NOT EXISTS Genres(
-	id SERIAL PRIMARY KEY,
-	name VARCHAR(50) NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS Artists(
-	id SERIAL PRIMARY KEY,
-	name VARCHAR(20) NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS GenresArtists (
-	id_artist INTEGER REFERENCES Artists(id),
-	id_genre INTEGER REFERENCES Genres(id),
-	CONSTRAINT ppk PRIMARY KEY (id_artist, id_genre) 
-);
-
-CREATE TABLE IF NOT EXISTS Albums(
-	id SERIAL PRIMARY KEY,
-	name VARCHAR(50) NOT NULL,
-	albums_year INTEGER
-);
-
-CREATE TABLE IF NOT EXISTS ArtistsAlbums (
-	id_artist INTEGER REFERENCES Artists(id),
-	id_album INTEGER REFERENCES Albums(id),
-CONSTRAINT sk PRIMARY KEY (id_artist, id_album) 
-);
-
-CREATE TABLE IF NOT EXISTS Tracks (
-id SERIAL PRIMARY KEY,
-id_album INTEGER REFERENCES Albums(id),
-name VARCHAR(80) NOT NULL,
-duration REAL 
-);
-
-CREATE TABLE IF NOT EXISTS Collections (
-id SERIAL PRIMARY KEY,
-name VARCHAR(80) NOT NULL,
-collection_year INTEGER 
-);
-
-CREATE TABLE IF NOT EXISTS CollectionsTracks (
-	id_collection INTEGER REFERENCES Collections(id),
-	id_tracks INTEGER REFERENCES Tracks(id),
-CONSTRAINT tk PRIMARY KEY (id_collection, id_tracks) 
-);
 
 -- Заполните базу данных из предыдущего домашнего задания. В ней должно быть:
 
@@ -101,7 +55,7 @@ INSERT INTO albums (name, album_year) VALUES
 ('fifth',2020),
 ('sixth',2022),
 ('seventh',2006),
-('eighth',2021)
+('eighth',2021);
 
 --таблица связи альбом-исполнитель:
 
@@ -126,24 +80,24 @@ INSERT INTO artistsalbums(id_artist, id_album) VALUES
 --where id>0;
 
 INSERT INTO tracks (id_album, name, duration) VALUES
-(1,'1track', 3.2),
-(1,'2track', 2.2),
-(2,'3track', 2.5),
-(2,'4track', 4.2),
-(3,'5track', 3.3),
-(3,'6track', 4.3),
-(4,'7track', 2.2),
-(4,'8track', 2.7),
-(5,'9track', 2.9),
-(5,'10track', 3.1),
-(6,'11track', 2.2),
-(6,'12track', 5.5),
-(7,'13track', 4.4),
-(7,'14track', 4.4),
-(8,'15track', 1.2),
-(8,'16track', 2.0),
-(6,'mytrack', 3.2),
-(7,'track_my', 4.2);
+(1,'1track', 186),
+(1,'2track', 123),
+(2,'3track', 87),
+(2,'4track', 221),
+(3,'5track', 133),
+(3,'6track', 110),
+(4,'7track', 156),
+(4,'8track', 165),
+(5,'9track', 144),
+(5,'10track', 178),
+(6,'11track', 192),
+(6,'12track', 172),
+(7,'13track', 192),
+(7,'14track', 138),
+(8,'15track', 107),
+(8,'16track', 99),
+(6,'mytrack', 122),
+(7,'track_my', 255);
 
 
 -- не менее 8 сборников.
@@ -180,3 +134,4 @@ INSERT INTO collectionstracks (id_collection, id_track) VALUES
 (7,15),
 (7,18),
 (7,16);
+

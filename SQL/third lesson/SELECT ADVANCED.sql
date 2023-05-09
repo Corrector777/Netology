@@ -1,7 +1,7 @@
 --количество исполнителей в каждом жанре;
 
-SELECT name, count(id_artist) FROM genresartists ga 
-LEFT JOIN genres g ON ga.id_genre  = g.id  
+SELECT name, count(id_artist) FROM genres g 
+JOIN genresartists ga ON ga.id_genre  = g.id  
 GROUP BY name;
 
 
@@ -28,10 +28,18 @@ ORDER BY AVG(duration) DESC;
 
 --все исполнители, которые не выпустили альбомы в 2020 году;
 
-SELECT DISTINCT a.name FROM artistsalbums aa 
-LEFT JOIN artists a ON aa.id_artist = a.id 
-LEFT JOIN albums al ON aa.id_album  = al.id 
-WHERE al.album_year != 2020;
+SELECT DISTINCT a.name FROM artists a 
+WHERE a.name NOT IN ( /* Где имя исполнителя не входит в вложенную выборку */
+    SELECT a.name FROM artists a  /* Из таблицы исполнителей */
+    JOIN artistsalbums aa ON a.id  = aa.id_artist  /* Объединяем с промежуточной таблицей */
+    JOIN albums al  ON aa.id_album  = al.id /* Объединяем с таблицей альбомов */
+    WHERE al.album_year = 2020) /* Где год альбома равен 2020 */
+
+--SELECT DISTINCT a.name, al.album_year  FROM artistsalbums aa 
+--LEFT JOIN artists a ON aa.id_artist = a.id 
+--LEFT JOIN albums al ON aa.id_album  = al.id 
+--WHERE al.album_year != 2020
+
 
 --названия сборников, в которых присутствует конкретный исполнитель (выберите сами);
 
@@ -45,13 +53,20 @@ WHERE artists.name LIKE '%Mick%';
 
 --название альбомов, в которых присутствуют исполнители более 1 жанра;
 
-SELECT a."name", count(g2."name")  FROM albums a 
-JOIN artistsalbums a2 ON a.id = a2.id_album 
-JOIN artists a3 ON a3.id = a2.id_artist 
-JOIN genresartists g ON a3.id = g.id_artist 
-JOIN genres g2 ON g2.id = g.id_genre
-GROUP BY a."name"
-HAVING COUNT(g2."name") > 1;
+SELECT DISTINCT a."name" /* Получаем ТОЛЬКО уникальные имена альбомов. Другие данные в выводе не нужны */
+FROM albums a  /* Из таблицы альбомов */
+JOIN artistsalbums a2  ON a.id  = a2.id_album  /* Объединяем альбомы с промежуточной таблицей между альбомами и исполнителями */
+JOIN genresartists g  ON a2.id_artist  = g.id_artist  /* Объединяем промежуточную таблицу выше с промежуточной таблицей между исполнителями и жанрами */
+GROUP BY a."name", g.id_artist  /* Группируем по айди альбомов и айди исполнителей из промежуточной таблицы между исполнителями и жанрами */
+HAVING COUNT(g.id_genre) > 1; /* Где количество id жанров из промежуточной таблицы больше 1 */
+
+--SELECT a."name", count(g2."name")  FROM albums a 
+--JOIN artistsalbums a2 ON a.id = a2.id_album 
+--JOIN artists a3 ON a3.id = a2.id_artist 
+--JOIN genresartists g ON a3.id = g.id_artist 
+--JOIN genres g2 ON g2.id = g.id_genre
+--GROUP BY a."name"
+--HAVING COUNT(g2."name") > 1;
 
 --наименование треков, которые не входят в сборники;
 
@@ -78,4 +93,5 @@ having count(t.id) =
 	group by a.id 
 	order by count(t.id)
 	limit 1);
+
 
