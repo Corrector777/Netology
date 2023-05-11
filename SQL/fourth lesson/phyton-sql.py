@@ -110,16 +110,31 @@ def delete_client(conn, client_id):
 
 def find_client(conn, first_name=None, last_name=None, email=None, phone=None):
     if phone is not None:
-        cur.execute("""SELECT clients.id FROM clients
+        cur.execute("""SELECT clients.id, clients.first_name, clients.last_name FROM clients
                     JOIN phone_numbers ON clients.id = phone_numbers.id_client
                     WHERE phone_numbers.phonenumber=%s ;""", (phone,))
     
+    elif email is not None:
+        cur.execute("""SELECT clients.id, clients.first_name, clients.last_name FROM clients
+                    WHERE email=%s;""",
+                    (email,))
+        
+    elif first_name is not None and last_name is not None:
+        cur.execute("""SELECT clients.id, clients.first_name, clients.last_name FROM clients
+                    WHERE first_name=%s and last_name=%s;""",
+                    (first_name, last_name))
+        
     else:
-        cur.execute("""SELECT clients.id FROM clients
-                    WHERE first_name=%s or last_name=%s or email=%s;""",
-                    (first_name, last_name, email))
-    
-    print(cur.fetchall())
+        cur.execute("""SELECT clients.id, clients.first_name, clients.last_name FROM clients
+                    WHERE first_name=%s or last_name=%s;""",
+                    (first_name, last_name))
+    result = cur.fetchall()
+    print(result)
+    print('следующие клиенты соответсвуют результату запроса :')
+    for i in result:
+        id, name, l_name = i       
+        print(f'клиент с id = {id} ---> {name} {l_name}')
+   
 
 
 with psycopg2.connect(database="pythondb", user="postgres", password=password) as conn:
@@ -131,12 +146,15 @@ with psycopg2.connect(database="pythondb", user="postgres", password=password) a
         # add_client(conn, 'Nick', 'Nolty', '222@dd.ru', '+79883342233')
         # add_client(conn, 'Addy', 'Harris', '222@dd.ru')
         # add_client(conn, 'Mary', 'XXX', 'xxx@dd.ru')
-        #______________________________________________________
+        # add_client(conn, 'Ann', 'Harris', '222@dd.ru')
+        # add_client(conn, 'Mary', 'XXX', 'xxx@dd.ru')
+
+        # ______________________________________________________
         # cur.execute("delete from phone_numbers where id>0;")
         # cur.execute("""ALTER SEQUENCE phone_numbers_id_seq RESTART WITH 1;""")
         # cur.execute("delete from clients where id>0;")
         # cur.execute("""ALTER SEQUENCE clients_id_seq RESTART WITH 1;""")       
-        #_______________________________________________________
+        # _______________________________________________________
         
         # cur.execute("""select * from phone_numbers""") # все номера телефонов в БД
         # print(f'таблица телефонов: {cur.fetchall()}')
@@ -149,8 +167,8 @@ with psycopg2.connect(database="pythondb", user="postgres", password=password) a
         # add_phone(conn, '1', '+79883342233')
         # add_phone(conn, '1', '+79883342993')
         # add_phone(conn, '1', '+79883342533')
-        # add_phone(conn, '2', '+79883342233')
-        # add_phone(conn, '3', '+79883342233')
+        # add_phone(conn, '2', '+79883346233')
+        # add_phone(conn, '55', '+79883344233')
 
         # 4.Функция, позволяющая изменить данные о клиенте (имя, фамилию и email). 
         # Должна быть возможность как изменить одно значение, так и сразу несколько
@@ -171,6 +189,8 @@ with psycopg2.connect(database="pythondb", user="postgres", password=password) a
         # 7.Функция, позволяющая найти клиента по его данным (имени, фамилии, email-у и телефону) .
         #  Должна быть возможность найти клиента как по одному параметру, так и по нескольким. 
         #  При передачи нескольких параметров, круг поиска должен сужаться.
-        # find_client(conn, phone='+79883342233')
-        find_client(conn, first_name="Ann", last_name='Nolty')
+        # find_client(conn, first_name="Ann",  last_name="Nolty")
+        # find_client(conn, phone='+79883342993')
+        # find_client(conn, first_name='Ann', phone='+79883342233')
+        # find_client(conn, first_name="Ann", last_name='Harris')
 
