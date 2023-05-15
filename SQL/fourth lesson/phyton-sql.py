@@ -225,7 +225,7 @@ with psycopg2.connect(database="pythondb", user="postgres", password=password) a
         # 5.Функция, позволяющая удалить телефон для существующего клиента
     delete_phone(conn, '1', '+79883342230')
     delete_phone(conn, '2', '+79883346234')
-    delete_ph/one(conn, '5', '+79883342233')
+    delete_phone(conn, '5', '+79883342233')
 
         # 6.Функция, позволяющая удалить существующего клиента
     delete_client(conn, client_id='1')
