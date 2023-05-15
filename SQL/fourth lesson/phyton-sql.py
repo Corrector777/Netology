@@ -123,46 +123,74 @@ def delete_client(conn, client_id):
         #     print(f'пользователь <<{client_id}>> успешно удален')
 
 
-def find_client(conn, first_name=None, last_name=None, email=None, phone=None):
-    with conn.cursor() as cur:
-        if phone is not None:
-            cur.execute("""SELECT clients.id, clients.first_name, clients.last_name FROM clients
-                        JOIN phone_numbers ON clients.id = phone_numbers.id_client
-                        WHERE phone_numbers.phonenumber=%s ;""", (phone,))
-    
-        elif email is not None:
-            cur.execute("""SELECT clients.id, clients.first_name, clients.last_name FROM clients
-                        WHERE email=%s;""",
-                        (email,))
-        
-        elif first_name is not None and last_name is not None:
-            cur.execute("""SELECT clients.id, clients.first_name, clients.last_name FROM clients
-                        WHERE first_name=%s and last_name=%s;""",
-                        (first_name, last_name))
-        
-        else:
-            cur.execute("""SELECT clients.id, clients.first_name, clients.last_name FROM clients
-                        WHERE first_name=%s or last_name=%s;""",
-                        (first_name, last_name))
-        result = cur.fetchall()
-        print(result)
+def find_client(conn, first_name='%', last_name='%', email='%', phone='%'):
+    with conn.cursor() as curs:
+        find = f"""  /* Описываем будущий запрос и сохраняем в переменную */
+            SELECT
+                cl.id,  
+                email, /* поле почты */
+                first_name, /* поле имени */
+                last_name,  /* поле фамилии*/
+                CASE
+                    WHEN ARRAY_AGG(phonenumber) = '{{Null}}' THEN '{{}}' /* Вместо точек указывается столбец, содержащий телефон. В данной строке, если у клиента нет номеров, то отправляем пустой массив */
+                    ELSE ARRAY_AGG(phonenumber) /* Вместо точек указывается столбец, содержащий телефон */
+                END phone_numbers 
+            FROM clients cl /* Из таблицы клиентов */
+            LEFT JOIN phone_numbers ph_n ON ph_n.id_client = cl.id /* Объединяем с таблицей телефонов */
+            WHERE first_name ILIKE %s AND last_name ILIKE %s AND email ILIKE %s AND phonenumber ILIKE %s /* Где имя, фамилия имейл и телефон соответствуют неким передаваемым значениям. Именно в таком поряке и необходимо писать условие */
+	    GROUP BY cl.id, email, first_name , last_name /* Группируем по почте, имени и фамилии */       
+	    """
+        curs.execute(
+            find,  # Передаем переменную с запросом
+            (first_name, last_name, email, phone)  # Передаем кортеж из имени, фамилии, почты и телефона
+        )
+        result = curs.fetchall()
         print('следующие клиенты соответсвуют результату запроса :')
+        # print(result)
         for i in result:
-            id, name, l_name = i       
-            print(f'клиент с id = {id} ---> {name} {l_name}')
+            id_number, email, name, l_name, phone = i       
+            print(f'клиент с id = {id_number} ---> {name} {l_name} \n email:' 
+                  f'{email} \n phone: {phone}\n ______________')
+
+# def find_client(conn, first_name=None, last_name=None, email=None, phone=None):
+#     with conn.cursor() as cur:
+#         if phone is not None:
+#             cur.execute("""SELECT clients.id, clients.first_name, clients.last_name FROM clients
+#                         JOIN phone_numbers ON clients.id = phone_numbers.id_client
+#                         WHERE phone_numbers.phonenumber=%s ;""", (phone,))
+    
+#         elif email is not None:
+#             cur.execute("""SELECT clients.id, clients.first_name, clients.last_name FROM clients
+#                         WHERE email=%s;""",
+#                         (email,))
+        
+#         elif first_name is not None and last_name is not None:
+#             cur.execute("""SELECT clients.id, clients.first_name, clients.last_name FROM clients
+#                         WHERE first_name=%s and last_name=%s;""",
+#                         (first_name, last_name))
+        
+#         else:
+#             cur.execute("""SELECT clients.id, clients.first_name, clients.last_name FROM clients
+#                         WHERE first_name=%s or last_name=%s;""",
+#                         (first_name, last_name))
+#         result = cur.fetchall()
+#         print('следующие клиенты соответсвуют результату запроса :')
+#         for i in result:
+#             id, name, l_name = i       
+#             print(f'клиент с id = {id} ---> {name} {l_name}')
    
 
 with psycopg2.connect(database="pythondb", user="postgres", password=password) as conn:
     
         # 1.Функция, создающая структуру БД. Т.е. в данной функции создаются таблицы в базе данных
-    # create_db(conn)
+    create_db(conn)
 
         # 2.Функция, позволяющая добавить нового клиента как с номером телефона, так и без него
-    # add_client(conn, 'Mike', 'Nolty', '212@dd.ru', '+79883342233')
-    # add_client(conn, 'Addy', 'Harris', '213@dd.ru')
-    # add_client(conn, 'Mary', 'XXX', 'xxx@dd.ru')
-    # add_client(conn, 'Ann', 'Harris', '214@dd.ru')
-    # add_client(conn, 'Mary', 'Colt', '191@dd.ru')
+    add_client(conn, 'Mike', 'Nolty', '212@dd.ru', '+79883342233')
+    add_client(conn, 'Addy', 'Harris', '213@dd.ru')
+    add_client(conn, 'Mary', 'XXX', 'xxx@dd.ru')
+    add_client(conn, 'Ann', 'Harris', '214@dd.ru')
+    add_client(conn, 'Mary', 'Colt', '191@dd.ru')
 
         # ______________________________________________________
     # with conn.cursor() as cur:    
@@ -179,34 +207,34 @@ with psycopg2.connect(database="pythondb", user="postgres", password=password) a
         # print(f'таблица клиентов: {cur.fetchall()}')
 
         # 3.Функция, позволяющая добавить телефон для существующего клиента
-    # add_phone(conn, '1', '+79883342230')
-    # add_phone(conn, '2', '+79883342231')
-    # add_phone(conn, '3', '+79883342232')
-    # add_phone(conn, '4', '+79883342533')
-    # add_phone(conn, '2', '+79883346234')
-    # add_phone(conn, '55', '+79883344235')
+    add_phone(conn, '1', '+79883342230')
+    add_phone(conn, '2', '+79883342231')
+    add_phone(conn, '3', '+79883342232')
+    add_phone(conn, '4', '+79883342533')
+    add_phone(conn, '2', '+79883346234')
+    add_phone(conn, '55', '+79883344235')
 
         # 4.Функция, позволяющая изменить данные о клиенте (имя, фамилию и email). 
         # Должна быть возможность как изменить одно значение, так и сразу несколько
-    # change_client(conn, '1', 'Ann')
-    # change_client(conn, client_id='1', first_name='Joe', last_name='Fradrich' , email='www@qqq.ru')
-    # change_client(conn, client_id='1', first_name='Igor')
-    # change_client(conn, client_id='3', first_name='Mary', last_name='Winter')
+    change_client(conn, client_id='1', first_name='Joe', last_name='Fradrich' , email='www@qqq.ru')
+    change_client(conn, client_id='1', first_name='Igor')
+    change_client(conn, client_id='3', first_name='Mary', last_name='Winter')
+    change_client(conn, '1', 'Ann')
     # change_client(conn, client_id='2')
 
         # 5.Функция, позволяющая удалить телефон для существующего клиента
-    # delete_phone(conn, '1', '+79883342230')
-    # delete_phone(conn, '2', '+79883346234')
-    # delete_phone(conn, '5', '+79883342233')
+    delete_phone(conn, '1', '+79883342230')
+    delete_phone(conn, '2', '+79883346234')
+    delete_ph/one(conn, '5', '+79883342233')
 
         # 6.Функция, позволяющая удалить существующего клиента
-    delete_client(conn, client_id='4')
+    delete_client(conn, client_id='1')
 
         # 7.Функция, позволяющая найти клиента по его данным (имени, фамилии, email-у и телефону) .
         #  Должна быть возможность найти клиента как по одному параметру, так и по нескольким. 
         #  При передачи нескольких параметров, круг поиска должен сужаться.
-    # find_client(conn, first_name="Ann",  last_name="Nolty")
-    # find_client(conn, phone='+79883346234')
-    # find_client(conn, first_name='Ann', phone='+79883342230')
-    # find_client(conn, first_name="Ann", last_name='Harris')
+    find_client(conn, first_name="Ann")
+    find_client(conn, phone='+79883346234')
+    find_client(conn, first_name='Ann', phone='+79883342230')
+    find_client(conn, last_name='Harris')
 
