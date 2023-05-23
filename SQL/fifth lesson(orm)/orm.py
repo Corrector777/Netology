@@ -2,7 +2,6 @@ import json
 from models import create_tables, Publisher, Book, Shop, Stock, Sale 
 import sqlalchemy
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import or_
 
 with open('/Users/roman/Git/SQL_pass.ini') as file:
     password = file.readline().strip()
@@ -31,8 +30,15 @@ for record in data:
 session.commit()
 
 publisher_search = input('введите имя или id издателя: ')
-subq = session.query(Publisher).filter(or_(Publisher.id == publisher_search, Publisher.name == publisher_search)).subquery()
-for i in session.query(Shop).join(Stock).join(Book).join(subq, Book.id_publisher == subq.c.Publisher.id).all():
-    print(i)
+shops = session.query(Shop).join(Stock).join(Book).join(Publisher)
+
+if publisher_search.isdigit(): #Проверяем состоит ли строка, которую ввел пользователь, только из чисел    
+    search = shops.filter(Publisher.id == publisher_search).all() #Применяем фильтрацию к уже ранее созданному запросу, где идентификационный номер публициста равен значению, который был передан в функцию, и сохраняем результат в переменную
+else:
+    search = shops.filter(Publisher.name == publisher_search).all() #Применяем фильтрацию к уже ранее созданному запросу, где имя публициста равен значению, который был передан в функцию, и сохраняем результат в переменную
+
+for shop in search: #Проходим в цикле по полученным данным из функции, получая при каждой итерации экземпляр класса
+    print(shop) #Обращаемся в к экземпляру и выводим его имя
+
 
 session.close()
