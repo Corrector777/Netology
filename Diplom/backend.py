@@ -1,27 +1,23 @@
 import vk_api
 
 
-from data import access_token, group_token
-from interface import Interface
-
+from data import access_token
 
 class VKApi:
 
-    def __init__(self, access_token, group_token):
-        self.vk_app = vk_api.VkApi(access_token)
-        self.vk_inteface = Interface(group_token)
-        self.id = ''
+    def __init__(self, access_token):
+        self.vk_app = vk_api.VkApi(token=access_token)
+     
 
-    def profile_info(self):
-        self.id = self.vk_inteface.id_return()
+    def profile_info(self, user_id):
         info = self.vk_app.method('users.get',
-                        {'user_id': self.id,
+                        {'user_id': user_id,
                         'fields': 'city, bdate,sex,relation,home_town'})[0]
         return info
 
 
 if __name__ == '__main__':
 
-    tools = VKApi(access_token, group_token)
-
-    print(tools.profile_info())
+    tools = VKApi(access_token)
+    user_id = 1546753
+    print(tools.profile_info(user_id))
