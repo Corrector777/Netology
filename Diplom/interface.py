@@ -22,12 +22,6 @@ class Interface():
                         'attachment': attachment,
                         'random_id': get_random_id()})
         
-    def id_return(self):
-        for event in self.longpoll.listen():
-            if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-                user = event.user_id
-        return user
-
 
     def events_handling(self):
         for event in self.longpoll.listen():
@@ -51,4 +45,4 @@ if __name__ == '__main__':
     bot = Interface(group_token)
 
     bot.events_handling()
-   
+
