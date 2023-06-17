@@ -23,7 +23,7 @@ class VKApi:
         
         result = {'id': info.get('id'),
                   'name': f"{info.get('first_name')}  {info.get('last_name')}",
-                  'city': None,     #info.get('city')['title'] if info.get('city') is not None else None,
+                  'city': info.get('city')['title'] if info.get('city') is not None else None,
                   'sex': info.get('sex'),
                   'age': user_age
                   }
