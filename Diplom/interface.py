@@ -31,30 +31,39 @@ class Interface():
                 message = event.text.lower()
                 if message in greeting:
                     self.message_send(user, 'Приветствую тебя, искатель необъятной любви.')
-                    self.my_user_info = self.vk_backend.profile_info(user)
-                    
-                    self.message_send(user, 'Что нам о Вас известно:')
+                    self.my_user_info = self.vk_backend.profile_info(user)                
+                    self.message_send(user, 'Давайте уточним информацию о Вас:')
                     self.message_send(user, f' Ваше имя: {self.my_user_info["name"]}')
-                    if self.my_user_info["age"] is not None:
-                        self.message_send(user, f' Ваш возраст: {self.my_user_info["age"]}')
-                    else:
-                        self.message_send(user, f' Возраста не хватает, введите:')
-                        self.my_user_info['age'] = event.text.title()
                     self.message_send(user, f' Ваш пол: {self.my_user_info["sex"]}')
-                    if self.my_user_info["age"] is not None:
-                        self.message_send(user, f' Ваш город: {self.my_user_info["city"]}\n_____________________')
-                    else:
+                    self.message_send(user, f' Ваш возраст: {self.my_user_info["age"]}')
+                    self.message_send(user, f' Ваш город: {self.my_user_info["city"]}\n_____________________')
+                          
+                elif message == 'поиск':
+                    self.message_send(user, f' Возраста не хватает, введите:')
+                    if self.my_user_info["age"] is None:
                         for event in self.longpoll.listen():
                             if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-                                self.message_send(user, f' Города нет, введите:')
+                                
+                                self.my_user_info['age'] = event.text.title()
+                                break
+                    else:
+                        continue
+
+                    if self.my_user_info["city"] is None: 
+                        self.message_send(user, 'Города нет, введите:')
+                        for event in self.longpoll.listen():
+                            if event.type == VkEventType.MESSAGE_NEW and event.to_me:
+                                
                                 self.my_user_info['city'] = event.text.title()
-                            break
-                elif message == 'поиск':
+                                break
+                    else:
+                        continue            
+
                     self.message_send(user, f'Давайте что-то вам подыщем\n_____________________')
                     self.message_send(user, f' \nИскать будем:\n'
                                             f' - пользователя противоположного пола\n'
                                             f'- из города : {self.my_user_info["city"]}\n'
-                                            f'- возраст в диапазоне от {self.my_user_info["age"] -3} до {self.my_user_info["age"] + 3}')
+                                            f'- возраст в диапазоне от {int(self.my_user_info["age"]) -3} до {int(self.my_user_info["age"]) + 3}')
                                                           
                 else:
                     self.message_send(user, '''Комманда неизвестна.
