@@ -39,25 +39,20 @@ class Interface():
                     self.message_send(user, f' Ваш город: {self.my_user_info["city"]}\n_____________________')
                           
                 elif message == 'поиск':
-                    self.message_send(user, f' Возраста не хватает, введите:')
                     if self.my_user_info["age"] is None:
+                        self.message_send(user, f' Возраста не хватает, введите:')
                         for event in self.longpoll.listen():
                             if event.type == VkEventType.MESSAGE_NEW and event.to_me:
                                 
                                 self.my_user_info['age'] = event.text.title()
                                 break
-                    else:
-                        continue
-
-                    if self.my_user_info["city"] is None: 
+                        
+                    if self.my_user_info["city"] is None:                       
                         self.message_send(user, 'Города нет, введите:')
                         for event in self.longpoll.listen():
                             if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-                                
                                 self.my_user_info['city'] = event.text.title()
-                                break
-                    else:
-                        continue            
+                                break          
 
                     self.message_send(user, f'Давайте что-то вам подыщем\n_____________________')
                     self.message_send(user, f' \nИскать будем:\n'
