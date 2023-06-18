@@ -18,7 +18,6 @@ with open('fixtures/tests_data.json', 'r') as fd:
     data = json.load(fd)
 
 for record in data:
-    # print(record)
     model = {
         'publisher': Publisher,
         'shop': Shop,
