@@ -8,6 +8,7 @@ from data import group_token, access_token
 
 greeting = ['привет', 'здравствуйте', 'хелоу', 'хай', 'hi', 'дд', 'hello']
 goodbye = ['пока', 'прощай', 'бай', 'bye', 'чао', 'удачи', 'исчезни']
+search = ['поиск', 'поехали', 's', 'п']
 
 
 class Interface():
@@ -16,7 +17,7 @@ class Interface():
         self.longpoll = VkLongPoll(self.vk_interface)
         self.vk_backend = VKApi(access_token)
         self.my_user_info = {}
-        
+            
     def message_send(self, user_id, message, attachment=None):
         self.vk_interface.method('messages.send',
                        {'user_id': user_id,
@@ -30,21 +31,23 @@ class Interface():
                 user = event.user_id
                 message = event.text.lower()
                 if message in greeting:
+                    self.my_user_info = self.vk_backend.profile_info(user) 
+                    self.sex = 'мужской' if self.my_user_info["sex"] == 2 else 'женский'
                     self.message_send(user, 'Приветствую тебя, искатель необъятной любви.')
                     self.message_send(user, '_____________________')
                     self.my_user_info = self.vk_backend.profile_info(user)                
                     self.message_send(user, 'Давайте уточним информацию о Вас:')                   
                     self.message_send(user, f' Ваше имя: {self.my_user_info["name"]}')
-                    self.message_send(user, f' Ваш пол: {self.my_user_info["sex"]}')
+                    self.message_send(user, f' Ваш пол: {self.sex}')
                     self.message_send(user, f' Ваш возраст: {self.my_user_info["age"]}')
                     self.message_send(user, f' Ваш город: {self.my_user_info["city"]}\n_____________________')
                           
-                elif message == 'поиск':
+                elif message in search:                          
+                    self.my_user_info = self.vk_backend.profile_info(user) 
                     if self.my_user_info["age"] is None:
                         self.message_send(user, f' Возраста не хватает, введите:')
                         for event in self.longpoll.listen():
                             if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-                                
                                 self.my_user_info['age'] = event.text.title()
                                 break
                         
@@ -62,6 +65,7 @@ class Interface():
                                             f'- возраст в диапазоне от {int(self.my_user_info["age"]) -3} до {int(self.my_user_info["age"]) + 3}')
                                                           
                 else:
+                    self.my_user_info = self.vk_backend.profile_info(user) 
                     self.message_send(user, '''Комманда неизвестна.
                                                     ___________________________________________
                                                     На данной стадии я знаю следующие комманды:

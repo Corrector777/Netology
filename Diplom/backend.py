@@ -16,7 +16,7 @@ class VKApi:
                                     'fields': 'city, sex, bdate'})[0]
         
         except ApiError as err:
-            info = {}
+            result = {}
             print(f'ошибка{err}')
         birth_date = info.get('bdate') if info.get('bdate') is not None else None
         user_age, = datetime.now().year - int(birth_date.split('.')[2]) if birth_date is not None and len(birth_date.split('.')) == 3 else None,
@@ -25,7 +25,7 @@ class VKApi:
                   'name': f"{info.get('first_name')}  {info.get('last_name')}",
                   'city': info.get('city')['title'] if info.get('city') is not None else None,
                   'sex': info.get('sex'),
-                  'age': user_age
+                  'age': None    #user_age
                   }
         # if result['age'] == None:
 
