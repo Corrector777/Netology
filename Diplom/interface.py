@@ -17,6 +17,7 @@ class Interface():
         self.longpoll = VkLongPoll(self.vk_interface)
         self.vk_backend = VKApi(access_token)
         self.my_user_info = {}
+        self.offset = 0
             
     def message_send(self, user_id, message, attachment=None):
         self.vk_interface.method('messages.send',
@@ -24,7 +25,7 @@ class Interface():
                         'message': message,
                         'attachment': attachment,
                         'random_id': randrange(10 ** 10)})
-        
+               
     def events_handling(self):
         for event in self.longpoll.listen():
             if event.type == VkEventType.MESSAGE_NEW and event.to_me:
@@ -68,10 +69,15 @@ class Interface():
                                             f'- из города : {self.my_user_info["city"]}\n'
                                             f'- возраст в диапазоне от {int(self.my_user_info["age"]) -3} до {int(self.my_user_info["age"]) + 1}')
                     self.message_send(user, f' \n\n\nрезультат:\n')
-                    partners = self.vk_backend.search_partners(self.my_user_info)
-                    for partner in partners:
-                    # partner = .pop()
-                        self.message_send(user, f'Встречайте:\n {partner["name"]} страница: vk.com/id{partner["id"]}')
+                     
+                    self.offset += 40
+                    partners = self.vk_backend.search_partners(self.my_user_info, self.offset)
+                    partner = partners.pop()
+                    partner_photos = self.vk_backend.get_photos(partner['id']) 
+                    self.message_send(user, f'Привет:\n {partner["name"]} страница: vk.com/id{partner["id"]}')
+                    for num, photo in enumerate(partner_photos, 1):
+                        attachment = f'photo{photo["owner_id"]}_{photo["id"]}'
+                        self.message_send(user, f' Фото номер {num}', attachment = attachment)
 
                 else:
                     self.message_send(user, '''Комманда неизвестна.
