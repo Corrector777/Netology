@@ -48,8 +48,12 @@ class Interface():
                         self.message_send(user, f' Возраста не хватает, введите:')
                         for event in self.longpoll.listen():
                             if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-                                self.my_user_info['age'] = event.text.title()
-                                break
+                                if event.text.isdigit():
+                                    self.my_user_info['age'] = event.text.title()
+                                    break
+                                else:
+                                    self.message_send(user, f' Неккоретно указан возраст(должны быть только цифры):')
+                                
                         
                     if self.my_user_info["city"] is None:                       
                         self.message_send(user, 'Города нет, введите:')
@@ -62,10 +66,14 @@ class Interface():
                     self.message_send(user, f' \nИскать будем:\n'
                                             f' - пользователя противоположного пола\n'
                                             f'- из города : {self.my_user_info["city"]}\n'
-                                            f'- возраст в диапазоне от {int(self.my_user_info["age"]) -3} до {int(self.my_user_info["age"]) + 3}')
-                                                          
+                                            f'- возраст в диапазоне от {int(self.my_user_info["age"]) -3} до {int(self.my_user_info["age"]) + 1}')
+                    self.message_send(user, f' \n\n\nрезультат:\n')
+                    partners = self.vk_backend.search_partners(self.my_user_info)
+                    for partner in partners:
+                    # partner = .pop()
+                        self.message_send(user, f'Встречайте:\n {partner["name"]} страница: vk.com/id{partner["id"]}')
+
                 else:
-                    self.my_user_info = self.vk_backend.profile_info(user) 
                     self.message_send(user, '''Комманда неизвестна.
                                                     ___________________________________________
                                                     На данной стадии я знаю следующие комманды:
