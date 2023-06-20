@@ -5,6 +5,7 @@ from vk_api.exceptions import ApiError
 from pprint import pprint
 from operator import itemgetter
 
+
 class VKApi:
 
     def __init__(self, access_token):
@@ -24,7 +25,7 @@ class VKApi:
         
         result = {'id': info.get('id'),
                   'name': f"{info.get('first_name')}  {info.get('last_name')}",
-                  'city': info.get('city')['title'] if info.get('city') is not None else None,
+                  'city': None,   #info.get('city')['title'] if info.get('city') is not None else None,
                   'sex': info.get('sex'),
                   'age': user_age
                   }   
@@ -40,7 +41,7 @@ class VKApi:
 
         try:
             search_partners = self.vk_app.method('users.search',
-                                                 {'count': 40,
+                                                 {'count': 5,
                                                   'offset': offset,
                                                   'age_from': age_from,
                                                   'age_to': age_to,
@@ -91,8 +92,18 @@ if __name__ == '__main__':
     vk_app = VKApi(access_token)
     # print(vk_app.profile_info(user_id))
     search_data = vk_app.profile_info(user_id)
-    profiles = vk_app.search_partners(search_data,30)
-    profile = profiles.pop()
-    owner_id = profile['id']
-    pprint(vk_app.get_photos(owner_id))
+    print(search_data)
+    # my_added = {'id': 1546753, 'name': 'Роман  Лысогор', 'city': 'Воллогда', 'sex': 2, 'age': 30}
+    # profiles = vk_app.search_partners(search_data, 5)
+    # pprint(profiles)
+    # while len(profiles) > 0:
+    #     profile = profiles.pop()
+    #     pprint(profile)
+    #     print('_______________')
+    # if profiles:
+    #     pprint('фото еще есть')
+    # else:
+    #     print('анкеты кончились')
+    # owner_id = profile['id']
+    # pprint(vk_app.get_photos(owner_id))
    
