@@ -5,6 +5,7 @@ from random import randrange
 
 from backend import VKApi
 from data import group_token, access_token
+from sql import *
 
 greeting = ['привет', 'здравствуйте', 'хелоу', 'хай', 'hi', 'дд', 'hello']
 goodbye = ['пока', 'прощай', 'бай', 'bye', 'чао', 'удачи', 'исчезни', 'стоп']
@@ -20,22 +21,27 @@ class Interface():
         self.offset = 0
         self.partner_profiles = []
         self.flag = True
+        self.partner_photos = []
+        
             
     def message_send(self, user_id, message, attachment=None):
         self.vk_interface.method('messages.send',
-                       {'user_id': user_id,
-                        'message': message,
-                        'attachment': attachment,
-                        'random_id': randrange(10 ** 10)})
+                                 {'user_id': user_id,
+                                  'message': message,
+                                  'attachment': attachment,
+                                  'random_id': randrange(10 ** 10)})
         
     def get_partner_photos(self, partner_profiles, user):
         if self.partner_profiles:
-            partner_profile = self.partner_profiles.pop()
-            partner_photos = self.vk_backend.get_photos(partner_profile['id']) 
-            self.message_send(user, f'Имя: {partner_profile["name"]}\n страница: vk.com/id{partner_profile["id"]}')
-            for num, photo in enumerate(partner_photos, start=1):
-                attachment = f'photo{photo["owner_id"]}_{photo["id"]}'
-                self.message_send(user, f' Фото номер {num}', attachment=attachment) 
+            while len(self.partner_profiles) > 0:
+                partner_profile = self.partner_profiles.pop()
+                if check_user(engine, user, partner_profile['id']) is False:
+                    self.partner_photos = self.vk_backend.get_photos(partner_profile['id']) 
+                    self.message_send(user, f'Имя: {partner_profile["name"]}\n страница: vk.com/id{partner_profile["id"]}')
+                    for num, photo in enumerate(self.partner_photos, start=1):
+                        attachment = f'photo{photo["owner_id"]}_{photo["id"]}'
+                        self.message_send(user, f' Фото номер {num}', attachment=attachment) 
+                    add_user(engine, user, partner_profile['id'])
             self.message_send(user, 'для продолжения набери "поиск"')
         else:
             self.message_send(user, f'{self.my_user_info["name"]}\n Результат поиска пуст!\nИзмените введенные данные(город, возраст)\nДля этого введите "привет"')
@@ -94,7 +100,7 @@ class Interface():
                         self.get_partner_photos(self.partner_profiles, user)
                        
                     else:
-                        self.offset += 5
+                        self.offset += 10
                         self.partner_profiles = self.vk_backend.search_partners(full_user_info, self.offset)
                         self.get_partner_photos(self.partner_profiles, user)
                         

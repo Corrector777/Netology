@@ -25,7 +25,7 @@ class VKApi:
         
         result = {'id': info.get('id'),
                   'name': f"{info.get('first_name')}  {info.get('last_name')}",
-                  'city': None,   #info.get('city')['title'] if info.get('city') is not None else None,
+                  'city': info.get('city')['title'] if info.get('city') is not None else None,
                   'sex': info.get('sex'),
                   'age': user_age
                   }   
@@ -41,7 +41,7 @@ class VKApi:
 
         try:
             search_partners = self.vk_app.method('users.search',
-                                                 {'count': 5,
+                                                 {'count': 10,
                                                   'offset': offset,
                                                   'age_from': age_from,
                                                   'age_to': age_to,
@@ -88,14 +88,12 @@ class VKApi:
 
 if __name__ == '__main__':
 
-    user_id = 1546753
-    vk_app = VKApi(access_token)
+    # user_id = 1546753
+    # vk_app = VKApi(access_token)
     # print(vk_app.profile_info(user_id))
-    search_data = vk_app.profile_info(user_id)
-    print(search_data)
-    # my_added = {'id': 1546753, 'name': 'Роман  Лысогор', 'city': 'Воллогда', 'sex': 2, 'age': 30}
+    # search_data = vk_app.profile_info(user_id)
+    # print(vk_app.get_photos(1111353))
     # profiles = vk_app.search_partners(search_data, 5)
-    # pprint(profiles)
     # while len(profiles) > 0:
     #     profile = profiles.pop()
     #     pprint(profile)
