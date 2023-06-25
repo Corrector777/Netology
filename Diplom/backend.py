@@ -88,20 +88,20 @@ class VKApi:
 
 if __name__ == '__main__':
 
-    # user_id = 1546753
-    # vk_app = VKApi(access_token)
-    # print(vk_app.profile_info(user_id))
-    # search_data = vk_app.profile_info(user_id)
-    # print(vk_app.get_photos(1111353))
-    # profiles = vk_app.search_partners(search_data, 5)
-    # while len(profiles) > 0:
-    #     profile = profiles.pop()
-    #     pprint(profile)
-    #     print('_______________')
-    # if profiles:
-    #     pprint('фото еще есть')
-    # else:
-    #     print('анкеты кончились')
-    # owner_id = profile['id']
-    # pprint(vk_app.get_photos(owner_id))
+    user_id = 1546753
+    vk_app = VKApi(access_token)
+    print(vk_app.profile_info(user_id))
+    search_data = vk_app.profile_info(user_id)
+    print(vk_app.get_photos(1111353))
+    profiles = vk_app.search_partners(search_data, 5)
+    while len(profiles) > 0:
+        profile = profiles.pop()
+        pprint(profile)
+        print('_______________')
+    if profiles:
+        pprint('фото еще есть')
+    else:
+        print('анкеты кончились')
+    owner_id = profile['id']
+    pprint(vk_app.get_photos(owner_id))
    
