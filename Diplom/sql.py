@@ -27,6 +27,7 @@ def add_user(engine, user_id, search_profile_id):
 
 # извлечение записей из БД
 
+
 def check_user(engine, user_id, search_profile_id):
     engine = create_engine(db_url_object)
     with Session(engine) as session:
