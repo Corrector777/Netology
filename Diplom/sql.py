@@ -33,6 +33,7 @@ def check_user(engine, user_id, search_profile_id):
         from_bd = session.query(Viewed).filter(Viewed.user_id == user_id, Viewed.search_profile_id == search_profile_id).all()
         return True if from_bd else False
 
+
 if __name__ == '__main__':
 
     engine = create_engine(db_url_object)
